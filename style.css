@@ -1,0 +1,202 @@
+/* General styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Navbar styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1a1a2e; /* Dark navy background */
+    color: white;
+    padding: 15px 30px; /* More padding for better spacing */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #f4f4f4; /* Light color for better readability */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: color 0.3s ease;
+}
+
+.navbar-brand:hover {
+    color: #f4c10f; /* Highlight brand on hover with a gold color */
+}
+
+.navbar-menu {
+    list-style: none;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-menu li {
+    margin-left: 25px;
+    position: relative; /* For the hover effect underline */
+}
+
+.navbar-menu li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+    padding-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.navbar-menu li a:hover {
+    color: #f4c10f; /* Gold color for hover state */
+}
+
+/* Animated underline on hover */
+.navbar-menu li a::after {
+    content: '';
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    background-color: #f4c10f;
+    left: 0;
+    bottom: -5px;
+    transition: width 0.3s ease-in-out;
+}
+
+.navbar-menu li a:hover::after {
+    width: 100%; /* Full width underline on hover */
+}
+
+/* Make the navbar responsive */
+@media (max-width: 768px) {
+    .navbar-menu {
+        flex-direction: column;
+        background-color: #1a1a2e;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        display: none;
+    }
+
+    .navbar-menu.active {
+        display: flex;
+    }
+
+    .navbar-menu li {
+        margin: 15px 0;
+        text-align: center;
+    }
+
+    .navbar-toggle {
+        display: block;
+        cursor: pointer;
+        font-size: 1.8rem;
+        color: white;
+    }
+}
+
+.navbar-toggle {
+    display: none;
+}
+
+/* Main container */
+.dashboard-container {
+    display: flex;
+    flex: 1;
+    margin-top: 70px; /* Adjust to navbar height to prevent overlap */
+}
+
+/* Sidebar styling */
+.sidebar {
+    width: 300px;
+    background-color: #f4f4f4;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #ddd;
+}
+
+.search-section h2, .slider-section h3 {
+    margin-bottom: 10px;
+}
+
+#searchInput {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+#searchButton {
+    width: 100%;
+    padding: 10px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#searchButton:hover {
+    background-color: #4cae4c;
+}
+
+/* Slider section */
+.slider-section {
+    margin-top: 20px;
+}
+
+.field-info p {
+    margin: 10px 0;
+}
+
+.field-info span {
+    font-weight: bold;
+}
+
+.map-container {
+    flex: 1;
+    position: relative;
+    background-color: #eaeaea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    background-color: #d4d4d4; /* Placeholder background */
+}
+
+
+/* Responsive layout */
+@media (max-width: 768px) {
+    .dashboard-container {
+      flex-direction: column;
+    }
+
+    .sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .map-container {
+      height: 400px;
+    }
+}

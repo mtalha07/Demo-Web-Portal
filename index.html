@@ -1,161 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Demo Web Portal</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
-  <script src="./vector_sugar.js"></script>
-  <style>
-    /* General Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body, html {
-      height: 100%;
-      font-family: Arial, sans-serif;
-    }
-
-    /* Heading styles */
-    header {
-      width: 100%;
-      height: 5rem;
-      background-color: #4CAF50;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    /* Responsive map container */
-    #map {
-      width: 100%;
-      height: calc(100vh - 5rem); /* Full height minus the height of the header */
-      position: relative;
-    }
-
-    .legend {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      padding: 10px;
-      background-color: white;
-      border: 1px solid #ccc;
-      z-index: 1000;
-    }
-
-    .area-info {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      padding: 10px;
-      background-color: white;
-      border: 1px solid #ccc;
-      z-index: 1000;
-      font-size: 14px;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      header {
-        font-size: 1.5rem;
-      }
-
-      .legend, .area-info {
-        font-size: 12px;
-        padding: 8px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sugarcane Dashboard</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="./JDW_sugarcane_ownership.js"></script>
+    <script src="script.js"></script>
 </head>
 <body>
-  <!-- Main heading -->
-  <header>
-    Demo Web Portal
-  </header>
+    <nav class="navbar">
+        <div class="navbar-brand">Crop Monitoring</div>
+        <span class="navbar-toggle">&#9776;</span> <!-- Hamburger icon for mobile view -->
+        <ul class="navbar-menu">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Map View</a></li>
+            <li><a href="#">Statistics</a></li>
+            <li><a href="#">Phenology</a></li>
+            <li><a href="#">Settings</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Main content area -->
+    <div class="dashboard-container">
+      <!-- Sidebar with search and slider -->
+      <aside class="sidebar">
+        <div class="search-section">
+          <h2>Search Fields</h2>
+          <input type="text" id="searchInput" placeholder="Search by Tehsil, Zone, Mouza, Owner...">
+          <button id="searchButton">Search</button>
+        </div>
+  
+        <div class="slider-section">
+          <h3>Field Details</h3>
+          <div class="field-info">
+            <!-- Field information will dynamically load here -->
+            <p>District: <span id="district">N/A</span></p>
+            <p>Tehsil:   <span id="tehsil">N/A</span></p>
+            <P>Mouza:    <span id="mouza">N/A</span></P>
+            <p>Owner:    <span id="ownerName">N/A</span></p>
+            <p>Owner Id: <span id="ownerId">N/A</span></p>
+            <p>Owner CNIC: <span id="ownerCnic">N/A</span></p>
+            <p>Contract: <span id="contract">N/A</span></p>
+            <p>Crop Type: <span id="cropType">N/A</span></p>
+            <p>Status: <span id="cropStatus">N/A</span></p>
+            <p>Area: <span id="area">N/A</span></p>
+          </div>
+        </div>
+      </aside>
+  
+      <!-- Map section -->
+      <div class="map-container">
+        <!-- This is where the map will be rendered -->
+        <div id="map"></div>
+      </div>
+    </div>
+  
+    <!-- Include your JavaScript or map service libraries here -->
 
-  <!-- Map section -->
-  <div id="map">
-    <!-- Legend container inside the map -->
-    <!-- <div class="legend">
-      <img src="http://localhost:8080/geoserver/Sugarcane/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=Sugarcane:Sugarcane_Raster" alt="Legend">
-    </div> -->
-    <!-- Area info box -->
-    <div id="area-info" class="area-info">Calculating area...</div>
-  </div>
-
-  <script>
-    // Initialize the map
-    var map = L.map('map').setView([28.52175, 70.04479], 10);
-
-    // Add OpenStreetMap base layer
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Thunderforest Transport layer
-    // var Thunderforest_Transport = L.tileLayer('https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey={apikey}', {
-    //   attribution: '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    //   apikey: 'YOUR_API_KEY', // Replace with your Thunderforest API key
-    //   maxZoom: 22
-    // });
-
-    // Add WMS layer from GeoServer
-    // var rasterlayer = L.tileLayer.wms('http://localhost:8080/geoserver/Sugarcane/wms', {
-    //   layers: 'Sugarcane:Sugarcane_Raster',
-    //   format: 'image/png',
-    //   transparent: true,
-    //   attribution: 'GeoServer'
-    // }).addTo(map);
-
-    // Fit map bounds to the bounding box of the raster layer
-    var bounds = [[28.494650644, 70.01325594], [28.542171522, 70.07730582]];
-    map.fitBounds(bounds);
-
-    // Add GeoJSON layer (assumed to be defined in vector_sugar.js)
-    var vectorlayer = L.geoJSON(vectorlayer, {
-      onEachFeature: function (feature, layer) {
-        // Add a click event listener to each polygon
-        layer.on('click', function () {
-          var area = turf.area(layer.toGeoJSON());  // Calculate area in square meters
-          var areaInHectares = area / 10000;  // Convert to hectares
-          var popupContent = "<b>Area:</b> " + areaInHectares.toFixed(2) + " hectares";
-          layer.bindPopup(popupContent).openPopup();
-        });
-      }
-    }).addTo(map);
-
-    // Layer control configuration
-    var baseMaps = {
-      "OpenStreetMap": osm,
-      // "Thunderforest Transport": Thunderforest_Transport
-    };
-
-    var overlayMaps = {
-      // "Raster Layer": rasterlayer,
-      "Vector Layer": vectorlayer
-    };
-
-    var layerControl = L.control.layers(baseMaps, overlayMaps, { collapsed: false }).addTo(map);
-
-    // Calculate and display total area of polygons in hectares
-    var totalArea = 0;
-    vectorlayer.eachLayer(function(layer) {
-      var area = turf.area(layer.toGeoJSON());  // Area in square meters
-      totalArea += area;
-    });
-
-    var totalAreaInHectares = totalArea / 10000;  // Convert to hectares
-    document.getElementById('area-info').innerHTML = '<b>Total Area of Sugarcane Fields:</b> ' + totalAreaInHectares.toFixed(2) + ' hectares';
-  </script>
-</body>
+    
+  </body>
 </html>
